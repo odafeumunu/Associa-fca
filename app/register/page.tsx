@@ -22,6 +22,7 @@ import StepFConsent from "./components/StepFConsent";
 import type { PlayerFormData } from "./schema"; // ✅ import your schema type
 import Header from "@/components/Header/Header";
 import FloatingSocialMenu from "@/components/FloatingSocialMenu/FloatingSocialMenu";
+import Footer from "@/components/Footer/Footer";
 
 // ✅ Define steps
 const steps = [
@@ -150,6 +151,7 @@ export default function RegisterPage() {
           )}
         </div>
       </div>
+      <Footer />
     </>
   );
 }

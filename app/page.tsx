@@ -2,12 +2,6 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-// import {
-//   Accordion,
-//   AccordionContent,
-//   AccordionItem,
-//   AccordionTrigger,
-// } from "@/components/ui/accordion";
 import Header from "@/components/Header/Header";
 import Image from "next/image";
 import Marquee from "react-fast-marquee";
@@ -23,12 +17,13 @@ import {
   Heart,
   Target,
   Eye,
+  ArrowRight,
+  UserPlus,
 } from "lucide-react";
 import { motion } from "framer-motion";
-// import TeamsGrid from "@/components/TeamGrid/TeamGrid";
-// import ResponsiveSwiper from "@/components/ui/ResponsiveSwiper";
 import FloatingSocialMenu from "@/components/FloatingSocialMenu/FloatingSocialMenu";
 import Gallery from "@/components/Gallery/Gallery";
+import Footer from "@/components/Footer/Footer";
 
 const categories = [
   {
@@ -71,35 +66,6 @@ const fees = [
   { type: "Tournament & League Levy", amount: "₦15,000", icon: Trophy },
 ];
 
-// const directors = [
-//   { name: "John Doe", position: "Chairman", img: "/p-10.jpg" },
-//   { name: "Samuel King", position: "Vice Chairman", img: "/p-10.jpg" },
-//   { name: "Alex Brown", position: "Secretary", img: "/p-10.jpg" },
-//   { name: "John Doe", position: "Chairman", img: "/p-10.jpg" },
-// ];
-
-// const executives = [
-//   { name: "John Doe", position: "Chief Executive Officer (CEO)", img: "/p-10.jpg" },
-//   { name: "Samuel King", position: "Club Manager", img: "/p-10.jpg" },
-//   { name: "Alex Brown", position: "Director of Football Operations", img: "/p-10.jpg" },
-//   { name: "Johnson Mann", position: "Finance & Administration Officer", img: "/p-10.jpg" },
-// ];
-
-// const technicals = [
-//   { name: "John Doe", position: "Head Coach (Male)", img: "/p-10.jpg" },
-//   { name: "Samuel King", position: "Head Coach (Female)", img: "/p-10.jpg" },
-//   { name: "Alex Brown", position: "Assistant Coaches (per age grade)", img: "/p-10.jpg" },
-//   { name: "Johnson Mann", position: "Fitness Trainer", img: "/p-10.jpg" },
-//   { name: "Bill Gate", position: "Goalkeeper Trainer", img: "/p-10.jpg" },
-//   { name: "Lawson Hull", position: "Medical Officer / Physiotherapist", img: "/p-10.jpg" },
-// ];
-
-// const supports = [
-//   { name: "John Doe", position: "Scouting & Talent Development Officer", img: "/p-10.jpg" },
-//   { name: "Samuel King", position: "Media & Communications Officer", img: "/p-10.jpg" },
-//   { name: "Alex Brown", position: "Logistics & Welfare Officer", img: "/p-10.jpg" },
-// ];
-
 
 
 export default function HomePage() {
@@ -129,7 +95,7 @@ export default function HomePage() {
           transition={{ duration: 0.6 }}>
           <h1 className="max-w-2xl mx-auto text-4xl md:text-6xl leading-snug uppercase text-white font-bold">
             Associa Football{" "}
-            <span className="text-lime-400">Club & Academy</span>
+            <span className="text-lime-500">Club & Academy</span>
           </h1>
           <p className="max-w-2xl mx-auto mb-5 text-sm md:text-lg text-white">
             Nurturing young football talents across Nigeria and Africa with
@@ -137,23 +103,28 @@ export default function HomePage() {
           </p>
           <div className="flex justify-center gap-4">
             <Link href="#about">
-              <Button size="lg" variant="outline" className="">
+              <Button
+                size="lg"
+                variant="outline"
+                className="flex items-center gap-2">
                 Explore
+                <ArrowRight size={18} />
               </Button>
             </Link>
             <Link href="/register">
               <Button
                 size="lg"
-                className="bg-lime-400 text-black hover:bg-lime-500">
+                className="flex items-center gap-2 bg-lime-500 hover:bg-lime-600">
                 Join Now
+                <UserPlus size={18} />
               </Button>
             </Link>
           </div>
         </motion.div>
       </div>
 
-      <div id="about" className="px-5 md:px-20 py-25 text-center">
-        <h1 className="text-teal-500 text-3xl md:text-4xl font-bold mb-10">
+      <div className="px-5 md:px-20 py-25 text-center">
+        <h1 className="text-sky-900 text-3xl md:text-4xl font-bold mb-10">
           About Us
         </h1>
         <motion.p
@@ -177,6 +148,18 @@ export default function HomePage() {
           ensuring their well-being on and off the field.
         </motion.p>
 
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.6 }}>
+          <Link href="/about">
+            <Button size="lg" className="bg-sky-900 hover:bg-sky-800">
+              See More
+            </Button>
+          </Link>
+        </motion.div>
+
         <div className="max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 mt-20">
           <motion.div
             className="bg-white shadow-lg rounded-lg p-5 flex flex-col items-center"
@@ -184,8 +167,8 @@ export default function HomePage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 0.6 }}>
-            <div className="w-15 h-15 bg-teal-50 rounded-full flex items-center justify-center">
-              <Target size={30} className="text-teal-500" />
+            <div className="w-15 h-15 bg-sky-1010 rounded-full flex items-center justify-center">
+              <Target size={30} className="text-sky-900" />
             </div>
             <h2 className="text-2xl font-bold my-6">Our Mission</h2>
             <p className="text-sm md:text-lg text-gray-600">
@@ -202,8 +185,8 @@ export default function HomePage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 0.6 }}>
-            <div className="w-15 h-15 bg-teal-50 rounded-full flex items-center justify-center">
-              <Eye size={30} className="text-teal-500" />
+            <div className="w-15 h-15 bg-sky10100 rounded-full flex items-center justify-center">
+              <Eye size={30} className="text-sky-900" />
             </div>
             <h2 className="text-2xl font-bold my-6">Our Vision</h2>
             <p className="text-sm md:text-lg text-gray-600">
@@ -215,7 +198,7 @@ export default function HomePage() {
       </div>
 
       <div id="categories" className="px-5 md:px-20 py-25 text-center bg-white">
-        <h1 className="text-teal-500 text-3xl md:text-4xl font-bold mb-10">
+        <h1 className="text-sky-900 text-3xl md:text-4xl font-bold mb-10">
           Club Categories
         </h1>
         <p className="max-w-2xl mx-auto text-grey-600 text-sm md:text-lg">
@@ -234,8 +217,8 @@ export default function HomePage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.3 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}>
-                <div className="w-20 h-20 bg-teal-50 rounded-full flex items-center justify-center">
-                  <Icon size={30} className="text-teal-500" />
+                <div className="w-15 h-15 bg-sky-100 rounded-full flex items-center justify-center">
+                  <Icon size={28} className="text-sky-900" />
                 </div>
                 <h2 className="text-2xl font-bold my-6">{cat.level}</h2>
                 <p className="text-sm md:text-lg text-gray-600">
@@ -248,14 +231,14 @@ export default function HomePage() {
       </div>
 
       <div id="gallery" className="px-5 md:px-20 py-25 text-center">
-        <h1 className="text-teal-500 text-3xl md:text-4xl font-bold mb-10">
+        <h1 className="text-sky-900 text-3xl md:text-4xl font-bold mb-10">
           Image Gallery
         </h1>
         <Gallery />
       </div>
 
       <div id="fees" className="px-5 md:px-20 py-25 text-center bg-white">
-        <h1 className="text-teal-500 text-3xl md:text-4xl font-bold mb-10">
+        <h1 className="text-sky-900 text-3xl md:text-4xl font-bold mb-10">
           Fees Structure
         </h1>
         <p className="max-w-2xl mx-auto text-gray-600 mb-8 text-sm md:text-lg">
@@ -272,13 +255,13 @@ export default function HomePage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 className="bg-white shadow-lg rounded-lg p-5 flex flex-col items-center justify-between hover:shadow-2xl transition">
-                <div className="w-13 h-13 bg-teal-50 rounded-full flex items-center justify-center mb-4">
-                  <Icon size={28} className="text-teal-500" />
+                <div className="w-13 h-13 bg-sky-100 rounded-full flex items-center justify-center mb-4">
+                  <Icon size={28} className="text-sky-900" />
                 </div>
                 <h2 className="font-semibold text-lg text-gray-800 text-center">
                   {fee.type}
                 </h2>
-                <p className="mt-4 text-2xl font-bold text-teal-500">
+                <p className="mt-4 text-2xl font-bold text-sky-900">
                   {fee.amount}
                 </p>
               </motion.div>
@@ -291,16 +274,16 @@ export default function HomePage() {
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="mt-13 bg-teal-500  text-white py-5 px-8 rounded-md inline-block shadow-lg animate-bounce">
+          className="mt-13 bg-sky-900  text-white py-5 px-8 rounded-md inline-block shadow-lg animate-bounce">
           <h2 className="text-xl md:text-1xl font-bold">
             Total Initial Payment:{" "}
-            <span className="text-yellow-300">₦125,000</span>
+            <span className="text-lime-300">₦125,000</span>
           </h2>
         </motion.div>
       </div>
 
       <div id="partnership" className="px-5 md:px-20 py-25 text-center">
-        <h1 className="text-teal-500 text-3xl md:text-4xl font-bold mb-10">
+        <h1 className="text-sky-900 text-3xl md:text-4xl font-bold mb-10">
           Partnerships
         </h1>
         <p className="max-w-2xl mx-auto text-gray-600 mb-8 text-sm md:text-lg">
@@ -309,200 +292,28 @@ export default function HomePage() {
 
         <div className="h-24 bg-white flex items-center justify-center">
           <Marquee speed={100}>
-            <div className="flex  gap-30 space-x-12">
+            <div className="flex items-center gap-16">
               {/* Replace text with logos using Next.js Image component */}
-              <div>
-                <Image
-                  src="/nhis.png"
-                  alt="Logo 1"
-                  width={100} // Adjust width and height as needed
-                  height={100} // Maintain aspect ratio
-                  className="object-contain"
-                />
-              </div>
-              <div>
-                <Image
-                  src="/nhis.png"
-                  alt="Logo 2"
-                  width={100} // Adjust width and height
-                  height={100}
-                  className="object-contain"
-                />
-              </div>
-              <div>
-                <Image
-                  src="/nhis.png"
-                  alt="Logo 3"
-                  width={100} // Adjust width and height
-                  height={100}
-                  className="object-contain"
-                />
-              </div>
-              {/* Add more logos if needed */}
+              {["/nhis.png", "/nhis.png", "/nhis.png"].map((src, index) => (
+                <div
+                  key={index}
+                  className="flex shrink-0 justify-center items-center w-[120px]">
+                  <Image
+                    src={src}
+                    alt={`Logo ${index + 1}`}
+                    width={100}
+                    height={100}
+                    className="object-contain"
+                  />
+                </div>
+              ))}
             </div>
           </Marquee>
         </div>
       </div>
 
-      {/* <div id="structure" className="px-5 md:px-20 py-25 text-center bg-white">
-        <h1 className="text-teal-500 text-3xl md:text-4xl font-bold mb-10">
-          Organisational Structure
-        </h1>
-
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}>
-          <Accordion
-            type="single"
-            collapsible
-            className="w-full border px-5 rounded-2xl shadow-sm"
-            defaultValue="item-1">
-            <AccordionItem value="item-1">
-              <AccordionTrigger className="text-left text-1xl md:text-2xl font-bold mb-10 hover:no-underline cursor-pointer">
-                Board of Directors
-              </AccordionTrigger>
-
-              <AccordionContent className="pt-5">
-                <ResponsiveSwiper
-                  items={directors}
-                  autoplayDelay={3000}
-                  renderItem={(item) => (
-                    <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-                      <div className="w-full">
-                        <Image
-                          src={item.img}
-                          alt={item.name}
-                          width={500}
-                          height={500}
-                          className="w-full h-auto object-cover object-top"
-                          priority
-                        />
-                      </div>
-
-                      <div className="p-4 text-center">
-                        <h2 className="font-bold text-lg text-teal-600">
-                          {item.name}
-                        </h2>
-                        <p className="text-gray-500">{item.position}</p>
-                      </div>
-                    </div>
-                  )}
-                />
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="item-2">
-              <AccordionTrigger className="text-left text-1xl md:text-2xl font-bold mb-10 hover:no-underline cursor-pointer">
-                Executive Management
-              </AccordionTrigger>
-
-              <AccordionContent className="pt-5">
-                <ResponsiveSwiper
-                  items={executives}
-                  autoplayDelay={3000}
-                  renderItem={(item) => (
-                    <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-                      <div className="w-full">
-                        <Image
-                          src={item.img}
-                          alt={item.name}
-                          width={500}
-                          height={500}
-                          className="w-full h-auto object-cover object-top"
-                          priority
-                        />
-                      </div>
-
-                      <div className="p-4 text-center">
-                        <h2 className="font-bold text-lg text-teal-600">
-                          {item.name}
-                        </h2>
-                        <p className="text-gray-500">{item.position}</p>
-                      </div>
-                    </div>
-                  )}
-                />
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="item-3">
-              <AccordionTrigger className="text-left text-1xl md:text-2xl font-bold mb-10 hover:no-underline cursor-pointer">
-                Technical Department
-              </AccordionTrigger>
-
-              <AccordionContent className="pt-5">
-                <ResponsiveSwiper
-                  items={technicals}
-                  autoplayDelay={3000}
-                  renderItem={(item) => (
-                    <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-                      <div className="w-full">
-                        <Image
-                          src={item.img}
-                          alt={item.name}
-                          width={500}
-                          height={500}
-                          className="w-full h-auto object-cover object-top"
-                          priority
-                        />
-                      </div>
-
-                      <div className="p-4 text-center">
-                        <h2 className="font-bold text-lg text-teal-600">
-                          {item.name}
-                        </h2>
-                        <p className="text-gray-500">{item.position}</p>
-                      </div>
-                    </div>
-                  )}
-                />
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="item-4">
-              <AccordionTrigger className="text-left text-1xl md:text-2xl font-bold mb-10 hover:no-underline cursor-pointer">
-                Support Services
-              </AccordionTrigger>
-
-              <AccordionContent className="pt-5">
-                <ResponsiveSwiper
-                  items={supports}
-                  autoplayDelay={3000}
-                  renderItem={(item) => (
-                    <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-                      <div className="w-full">
-                        <Image
-                          src={item.img}
-                          alt={item.name}
-                          width={500}
-                          height={500}
-                          className="w-full h-auto object-cover object-top"
-                          priority
-                        />
-                      </div>
-
-                      <div className="p-4 text-center">
-                        <h2 className="font-bold text-lg text-teal-600">
-                          {item.name}
-                        </h2>
-                        <p className="text-gray-500">{item.position}</p>
-                      </div>
-                    </div>
-                  )}
-                />
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
-        </motion.div>
-      </div> */}
-
-      <footer className="bg-black text-white py-6 text-center">
-        <p className="text-sm">
-          © {new Date().getFullYear()} Associa Football Club & Academy Limited.
-          All rights reserved.
-        </p>
-      </footer>
+      
+      <Footer />
     </>
   );
 }

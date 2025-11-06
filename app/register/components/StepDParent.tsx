@@ -56,7 +56,7 @@ export default function StepDParent() {
     <div className="space-y-6 md:bg-white md:px-5 md:border md:rounded-lg md:shadow-sm py-6">
       {/* Step Title */}
       <div>
-        <h2 className="text-xl font-semibold tracking-tight text-teal-500">
+        <h2 className="text-xl font-semibold tracking-tight text-sky-900">
           Parent / Guardian Information
         </h2>
         <p className="text-sm text-muted-foreground">

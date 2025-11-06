@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
@@ -176,7 +176,7 @@ export default function StepAPlayerInfo() {
   return (
     <div className="space-y-6 md:bg-white md:px-5 md:border md:rounded-lg md:shadow-sm py-6">
       <div>
-        <h2 className="text-xl font-semibold tracking-tight text-teal-500">
+        <h2 className="text-xl font-semibold tracking-tight text-sky-900">
           Player Information
         </h2>
         <p className="text-sm text-muted-foreground">
@@ -220,6 +220,7 @@ export default function StepAPlayerInfo() {
               <Calendar
                 mode="single"
                 selected={date}
+                captionLayout="dropdown"       
                 onSelect={(selectedDate) => {
                   setDate(selectedDate);
                   if (selectedDate) {

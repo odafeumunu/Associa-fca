@@ -52,7 +52,7 @@ export default function FloatingSocialMenu() {
       {/* Toggle Button */}
       <button
         onClick={() => setOpen(!open)}
-        className="bg-lime-400 hover:bg-lime-500 text-white p-4 rounded-full shadow-sm transition-transform transform hover:scale-110 focus:outline-none">
+        className="bg-sky-900 hover:bg-sky-800 text-white p-4 rounded-full shadow-sm transition-transform transform hover:scale-110 focus:outline-none">
         {open ? <X size={20} /> : <MessageCircle size={24} />}
       </button>
     </div>
