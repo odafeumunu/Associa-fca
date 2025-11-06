@@ -13,7 +13,6 @@ import debounce from "lodash.debounce";
 
 type FormData = z.infer<typeof ConsentSchema>;
 
-
 function RequiredLabel({ children }: { children: React.ReactNode }) {
   return (
     <Label className="mb-2">
@@ -59,10 +58,10 @@ export default function StepFConsent() {
   }, [form]);
 
   return (
-    <div className="space-y-6 px-5 border rounded-lg shadow-sm py-6">
+    <div className="space-y-6 md:bg-white md:px-5 md:border md:rounded-lg md:shadow-sm py-6">
       {/* Step Title */}
       <div>
-        <h2 className="text-xl font-semibold tracking-tight text-blue-500">
+        <h2 className="text-xl font-semibold tracking-tight text-teal-500">
           Consent
         </h2>
         <p className="text-sm text-muted-foreground">
@@ -76,7 +75,7 @@ export default function StepFConsent() {
         noValidate>
         {/* Consent Checkboxes */}
         <div className="space-y-4">
-          <div className="flex items-center gap-2">
+          <div className="flex items-start gap-2">
             <Checkbox
               checked={watchAllFields.consent_participate || false}
               onCheckedChange={(checked) =>
@@ -86,7 +85,7 @@ export default function StepFConsent() {
             <RequiredLabel>I consent to participate</RequiredLabel>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-start gap-2">
             <Checkbox
               checked={watchAllFields.consent_information_accurate || false}
               onCheckedChange={(checked) =>
@@ -96,7 +95,7 @@ export default function StepFConsent() {
             <RequiredLabel>I confirm information is accurate</RequiredLabel>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-start gap-2">
             <Checkbox
               checked={watchAllFields.consent_liability_release || false}
               onCheckedChange={(checked) =>
@@ -106,7 +105,7 @@ export default function StepFConsent() {
             <RequiredLabel>I release liability</RequiredLabel>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-start gap-2">
             <Checkbox
               checked={watchAllFields.consent_abide_rules || false}
               onCheckedChange={(checked) =>
@@ -131,33 +130,38 @@ export default function StepFConsent() {
           ) : null
         )}
 
-        {/* Signatures */}
-        <div className="flex flex-col">
-          <RequiredLabel>Parent Signature</RequiredLabel>
-          <Input
-            value={form.watch("parent_signature") || ""}
-            onChange={(e) => form.setValue("parent_signature", e.target.value)}
-            placeholder="Parent signature"
-          />
-          {form.formState.errors.parent_signature && (
-            <p className="text-red-500 text-sm">
-              {form.formState.errors.parent_signature.message}
-            </p>
-          )}
-        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="flex flex-col">
+            <RequiredLabel>Parent Signature</RequiredLabel>
+            <Input
+              value={form.watch("parent_signature") || ""}
+              onChange={(e) =>
+                form.setValue("parent_signature", e.target.value)
+              }
+              placeholder="Enter Parent Name"
+            />
+            {form.formState.errors.parent_signature && (
+              <p className="text-red-500 text-sm">
+                {form.formState.errors.parent_signature.message}
+              </p>
+            )}
+          </div>
 
-        <div className="flex flex-col">
-          <Label className="mb-2">Player Signature</Label>
-          <Input
-            value={form.watch("player_signature") || ""}
-            onChange={(e) => form.setValue("player_signature", e.target.value)}
-            placeholder="Player signature"
-          />
-          {form.formState.errors.player_signature && (
-            <p className="text-red-500 text-sm">
-              {form.formState.errors.player_signature.message}
-            </p>
-          )}
+          <div className="flex flex-col">
+            <Label className="mb-2">Player Signature</Label>
+            <Input
+              value={form.watch("player_signature") || ""}
+              onChange={(e) =>
+                form.setValue("player_signature", e.target.value)
+              }
+              placeholder="Enter Player Name"
+            />
+            {form.formState.errors.player_signature && (
+              <p className="text-red-500 text-sm">
+                {form.formState.errors.player_signature.message}
+              </p>
+            )}
+          </div>
         </div>
       </form>
     </div>

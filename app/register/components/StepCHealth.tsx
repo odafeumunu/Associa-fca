@@ -89,9 +89,9 @@ export default function StepCHealth() {
   }, [form]);
 
   return (
-    <div className="space-y-6 px-5 border rounded-lg shadow-sm py-6">
+    <div className="space-y-6 md:bg-white md:px-5 md:border md:rounded-lg md:shadow-sm py-6">
       <div>
-        <h2 className="text-xl font-semibold tracking-tight text-blue-500">
+        <h2 className="text-xl font-semibold tracking-tight text-teal-500">
           Health Information
         </h2>
         <p className="text-sm text-muted-foreground">
@@ -101,7 +101,7 @@ export default function StepCHealth() {
 
       <form
         onBlur={form.handleSubmit(updateData)}
-        className="space-y-4"
+        className="space-y-6"
         noValidate>
         {/* Medical Condition */}
         <div className="flex flex-col gap-2">

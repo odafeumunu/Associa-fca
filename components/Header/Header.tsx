@@ -3,24 +3,25 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Home, User, Layers, Camera } from "lucide-react";
 import Image from "next/image";
 
 type NavLink = {
   href: string;
   label: string;
+  icon: React.ReactNode;
 };
 
 const navLinks: NavLink[] = [
-  { href: "/#home", label: "Home" },
-  { href: "/#about", label: "About us" },
-  { href: "/#categories", label: "Categories" },
-  { href: "/#gallery", label: "Gallery" },
-  { href: "/#fees", label: "Fees" },
-  { href: "/#partnership", label: "Partnerships" },
-  { href: "/#structure", label: "Structure" },
+  { href: "/#home", label: "Home", icon: <Home size={18} /> },
+  { href: "/#about", label: "About us", icon: <User size={18} /> },
+  { href: "/#categories", label: "Categories", icon: <Layers size={18} /> },
+  {
+    href: "/#gallery",
+    label: "Gallery",
+    icon: <Camera size={18} />,
+  },
 ];
-
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("");
@@ -119,11 +120,19 @@ export default function Header() {
   return (
     <>
       <header className="fixed top-0 left-0 w-full bg-white shadow-md z-50">
-        <div className="px-5 mx-auto flex h-20 items-center justify-between">
-          <Image src="/logo.png" alt="associafca logo" height={45} width={45} priority />
+        <div className="px-5 md:px-20 mx-auto flex h-20 items-center justify-between">
+          <Link href="/">
+            <Image
+              src="/logo.png"
+              alt="associafca logo"
+              height={55}
+              width={55}
+              priority
+            />
+          </Link>
 
           <nav className="hidden lg:flex items-center gap-2">
-            {navLinks.map(({ href, label }) => {
+            {navLinks.map(({ href, label, icon }) => {
               const id = href.split("#")[1];
               const isActive = activeSection === id;
               return (
@@ -132,11 +141,10 @@ export default function Header() {
                   href={href}
                   scroll={false}
                   onClick={(e) => handleNavClick(e, href)}
-                  className={`text-xs font-semibold rounded-2xl py-2 px-5 transition ${
-                    isActive
-                      ? "bg-blue-100 text-blue-500"
-                      : "hover:bg-blue-100 hover:text-blue-500"
+                  className={`text-sm font-semibold mx-5 flex items-center gap-2 transition ${
+                    isActive ? "text-teal-500" : "hover:text-teal-500"
                   }`}>
+                  {icon}
                   {label}
                 </Link>
               );
@@ -144,8 +152,8 @@ export default function Header() {
           </nav>
 
           <Link href="/register" className="hidden md:flex items-center">
-            <Button className="ml-4 bg-blue-600 hover:bg-blue-700">
-              Join Now
+            <Button className="ml-4 bg-teal-600 hover:bg-teal-700">
+              Register
             </Button>
           </Link>
 
@@ -153,7 +161,7 @@ export default function Header() {
             <button
               aria-label="Toggle menu"
               onClick={toggleMenu}
-              className="p-2 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400">
+              className="p-2 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-400">
               {isOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
@@ -162,7 +170,7 @@ export default function Header() {
         {isOpen && (
           <nav className="md:hidden bg-white border-t border-gray-200 shadow-md">
             <div className="flex flex-col gap-4 p-6">
-              {navLinks.map(({ href, label }) => {
+              {navLinks.map(({ href, label, icon }) => {
                 const id = href.split("#")[1];
                 const isActive = activeSection === id;
                 return (
@@ -174,19 +182,20 @@ export default function Header() {
                       handleNavClick(e, href);
                       setIsOpen(false);
                     }}
-                    className={`text-base font-medium transition ${
+                    className={`text-base flex items-center gap-2 font-medium transition ${
                       isActive
-                        ? "text-blue-600 font-semibold"
-                        : "hover:text-blue-500"
+                        ? "text-teal-600 font-semibold"
+                        : "hover:text-teal-500"
                     }`}>
+                    {icon}
                     {label}
                   </Link>
                 );
               })}
 
               <Link href="/register" onClick={() => setIsOpen(false)}>
-                <Button className="w-full mt-2 bg-blue-600 hover:bg-blue-700">
-                  Join Now
+                <Button className="w-full mt-2 bg-teal-600 hover:bg-teal-700">
+                  Register
                 </Button>
               </Link>
             </div>

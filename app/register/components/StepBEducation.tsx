@@ -54,9 +54,9 @@ export default function StepBEducation() {
   }, [form, updateData, localDataLoaded]);
 
   return (
-    <div className="space-y-6 px-5 border rounded-lg shadow-sm py-6">
+    <div className="space-y-6 md:bg-white md:px-5 md:border md:rounded-lg md:shadow-sm py-6">
       <div>
-        <h2 className="text-xl font-semibold tracking-tight text-blue-500">
+        <h2 className="text-xl font-semibold tracking-tight text-teal-500">
           Education Information
         </h2>
         <p className="text-sm text-muted-foreground">
@@ -66,7 +66,7 @@ export default function StepBEducation() {
 
       <form
         onBlur={form.handleSubmit(updateData)}
-        className="space-y-4"
+        className="space-y-6 grid grid-cols-1 md:grid-cols-2 gap-4"
         noValidate>
         <div className="flex flex-col">
           <Label className="mb-2">Current School</Label>

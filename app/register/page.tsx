@@ -21,6 +21,7 @@ import StepFConsent from "./components/StepFConsent";
 
 import type { PlayerFormData } from "./schema"; // ✅ import your schema type
 import Header from "@/components/Header/Header";
+import FloatingSocialMenu from "@/components/FloatingSocialMenu/FloatingSocialMenu";
 
 // ✅ Define steps
 const steps = [
@@ -42,7 +43,6 @@ export default function RegisterPage() {
     mutationFn: async (
       formData: PlayerFormData
     ): Promise<{ success: boolean }> => {
-      console.log("Sending to API:", formData);
 
       try {
         // Send request to the `register_player` endpoint using Axios
@@ -59,7 +59,6 @@ export default function RegisterPage() {
 
         return res.data; // Return the data from the response
       } catch (error) {
-        // Handle error
         console.error("Error while submitting form:", error);
         throw new Error(
           error instanceof Error ? error.message : "Something went wrong."
@@ -68,11 +67,15 @@ export default function RegisterPage() {
     },
 
     onSuccess: () => {
+      // Save registration success flag in sessionStorage
+      sessionStorage.setItem("isRegistered", "true");
+
       toast.success("Registration Successful 🎉", {
         description: "Your registration has been received!",
       });
+
       reset();
-      router.push("/"); // Navigate to the homepage after success
+      router.push("/success"); // Navigate to the success page after successful registration
     },
 
     onError: (err: unknown) => {
@@ -83,6 +86,7 @@ export default function RegisterPage() {
       });
     },
   });
+
 
   // ✅ Progress percentage
   const percent = ((step + 1) / steps.length) * 100;
@@ -96,7 +100,7 @@ export default function RegisterPage() {
         console.log(`Field: ${issue.path.join(".")}, Error: ${issue.message}`);
       });
 
-      toast.error("Please fix errors before continuing");
+      toast.error("Please fill all the required fields with asterisks");
       return;
     }
 
@@ -104,45 +108,48 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="px-5 mx-auto max-w-2xl py-10">
+    <>
+      <FloatingSocialMenu />
       <Header />
-      {/* Progress Bar */}
-      <div className="mb-6">
-        <Progress value={percent} className="h-2" />
-        <p className="text-sm text-gray-500 text-right mt-2">
-          Step {step + 1} of {steps.length}
-        </p>
-      </div>
+      <div className="px-5 md:px-20 mx-auto max-w-1xl py-10">
+        {/* Progress Bar */}
+        <div className="mb-6">
+          <Progress value={percent} className="h-2" />
+          <p className="text-sm text-gray-500 text-right mt-2">
+            Step {step + 1} of {steps.length}
+          </p>
+        </div>
 
-      {/* Step Content */}
-      <motion.div
-        key={step}
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}>
-        <CurrentStep />
-      </motion.div>
+        {/* Step Content */}
+        <motion.div
+          key={step}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}>
+          <CurrentStep />
+        </motion.div>
 
-      {/* Navigation Buttons */}
-      <div className="flex justify-between mt-6">
-        <Button variant="outline" onClick={prevStep} disabled={step === 0}>
-          Back
-        </Button>
-        {step === steps.length - 1 ? (
-          <Button
-            className="bg-blue-600 hover:bg-blue-700"
-            onClick={() => mutation.mutate(data as PlayerFormData)}
-            disabled={mutation.isPending}>
-            {mutation.isPending ? "Submitting..." : "Submit"}
+        {/* Navigation Buttons */}
+        <div className="flex justify-between mt-6">
+          <Button variant="outline" onClick={prevStep} disabled={step === 0}>
+            Back
           </Button>
-        ) : (
-          <Button
-            className="bg-blue-600 hover:bg-blue-700"
-            onClick={handleNext}>
-            Next
-          </Button>
-        )}
+          {step === steps.length - 1 ? (
+            <Button
+              className="bg-teal-600 hover:bg-teal-700"
+              onClick={() => mutation.mutate(data as PlayerFormData)}
+              disabled={mutation.isPending}>
+              {mutation.isPending ? "Submitting..." : "Submit"}
+            </Button>
+          ) : (
+            <Button
+              className="bg-teal-600 hover:bg-teal-700"
+              onClick={handleNext}>
+              Next
+            </Button>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }

@@ -45,10 +45,10 @@ export default function StepEEmergency() {
   }, [form]);
 
   return (
-    <div className="space-y-6 px-5 border rounded-lg shadow-sm py-6">
+    <div className="space-y-6 md:bg-white md:px-5 md:border md:rounded-lg md:shadow-sm py-6">
       {/* Step Title */}
       <div>
-        <h2 className="text-xl font-semibold tracking-tight text-blue-500">
+        <h2 className="text-xl font-semibold tracking-tight text-teal-500">
           Emergency Contact Information
         </h2>
         <p className="text-sm text-muted-foreground">
@@ -58,7 +58,7 @@ export default function StepEEmergency() {
 
       <form
         onBlur={form.handleSubmit(updateData)}
-        className="space-y-4"
+        className="space-y-6 grid grid-cols-1 md:grid-cols-2 gap-4"
         noValidate>
         {/* Name */}
         <div className="flex flex-col">

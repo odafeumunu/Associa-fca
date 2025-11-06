@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
@@ -49,7 +49,7 @@ const RequiredLabel = ({ children }: { children: React.ReactNode }) => (
 export default function StepAPlayerInfo() {
   const { updateData, data: formData } = useFormStore();
 
-  // Form state
+  /** -------------------- Form Setup -------------------- **/
   const [date, setDate] = useState<Date | undefined>(
     formData?.date_of_birth ? new Date(formData.date_of_birth) : undefined
   );
@@ -62,6 +62,8 @@ export default function StepAPlayerInfo() {
 
   const form = useForm<FormData>({
     resolver: zodResolver(PlayerInfoSchema),
+    mode: "onSubmit", // ✅ only validate when submitting
+    reValidateMode: "onChange", // ✅ validate changed field only
     defaultValues: {
       full_name: formData?.full_name || "",
       date_of_birth: formData?.date_of_birth || "",
@@ -76,125 +78,105 @@ export default function StepAPlayerInfo() {
     },
   });
 
-  /** ================= States (Paginated) ================= */
+  /** -------------------- Fetch States -------------------- **/
   const { data: states } = useQuery<State[]>({
     queryKey: ["states"],
     queryFn: async () => {
       let allStates: State[] = [];
       let page = 1;
       const perPage = 20;
-      let totalFetched = 0;
-
       while (true) {
         const res = await api.get(
           `${endpoints.State.get_all_states}?page=${page}&limit=${perPage}`
         );
-        console.log(`Fetched states page ${page}:`, res.data.results);
-
         allStates = allStates.concat(res.data.results);
-        totalFetched += res.data.results.length;
-
         if (!res.data.next || res.data.results.length === 0) break;
         page++;
       }
-
-      console.log("Total states fetched:", allStates.length);
       return allStates;
     },
   });
 
-  /** ================= LGAs ================= */
-  const { data: lgas, isLoading: isLgaLoading } = useQuery<LGA[]>({
+  /** -------------------- Fetch LGAs -------------------- **/
+  const { data: lgas } = useQuery<LGA[]>({
     queryKey: ["lgas", selectedState],
     queryFn: async () => {
       if (!selectedState) return [];
       const res = await api.get(
         `${endpoints.LGA.get_lgas}?state=${selectedState}`
       );
-      console.log(`Fetched LGAs for state ${selectedState}:`, res.data.results);
       return res.data.results;
     },
     enabled: !!selectedState && selectedState > 0,
   });
 
-  // ✅ Ensure selected LGA is valid after LGA list loads
+  /** -------------------- Validate LGA after load -------------------- **/
   useEffect(() => {
     if (lgas && selectedLga) {
       const valid = lgas.find((lga) => lga.id === selectedLga);
       if (!valid) {
-        console.log(
-          "Resetting selected LGA because it's not valid for this state"
-        );
         setSelectedLga(0);
         form.setValue("lga", 0);
-      } else {
-        console.log("Selected LGA is valid:", selectedLga);
       }
     }
   }, [lgas]);
 
-  // Load localStorage on mount
+  /** -------------------- Load from LocalStorage -------------------- **/
   useEffect(() => {
-    const savedPlayerInfoData = localStorage.getItem("playerInfoFormData");
-    if (savedPlayerInfoData) {
-      const parsedData = JSON.parse(savedPlayerInfoData);
-      form.reset(parsedData);
-
-      if (parsedData.state_of_origin)
-        setSelectedState(parsedData.state_of_origin);
-      if (parsedData.lga) setSelectedLga(parsedData.lga);
-      if (parsedData.date_of_birth) setDate(new Date(parsedData.date_of_birth));
+    const saved = localStorage.getItem("playerInfoFormData");
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      form.reset(parsed);
+      if (parsed.state_of_origin) setSelectedState(parsed.state_of_origin);
+      if (parsed.lga) setSelectedLga(parsed.lga);
+      if (parsed.date_of_birth) setDate(new Date(parsed.date_of_birth));
     }
   }, [form]);
 
-  // Sync Zustand store
+  /** -------------------- Sync Zustand store -------------------- **/
   useEffect(() => {
     if (formData) {
       form.reset(formData);
-
-      if (formData.state_of_origin) {
-        setSelectedState(formData.state_of_origin);
-      }
-
-      if (formData.lga) {
-        setSelectedLga(formData.lga);
-      }
-
-      if (formData.date_of_birth) {
-        setDate(new Date(formData.date_of_birth));
-      }
+      if (formData.state_of_origin) setSelectedState(formData.state_of_origin);
+      if (formData.lga) setSelectedLga(formData.lga);
+      if (formData.date_of_birth) setDate(new Date(formData.date_of_birth));
     }
-  }, []); // empty dependency: run once
+  }, []);
 
-  // Debounced auto-save
-  useEffect(() => {
-    const subscription = form.watch(
-      debounce((values) => {
+  /** -------------------- Debounced Auto-Save -------------------- **/
+  const debouncedSave = useMemo(
+    () =>
+      debounce((values: Partial<FormData>) => {
         if (!values.full_name) return;
 
-        const formDataToSave = {
+        const toSave = {
           ...values,
           state_of_origin: selectedState || 0,
-          // Use form value directly instead of stale selectedLga
           lga: form.getValues("lga") || 0,
         };
 
-        console.log("Auto-saving:", formDataToSave);
-        updateData(formDataToSave);
-        localStorage.setItem(
-          "playerInfoFormData",
-          JSON.stringify(formDataToSave)
-        );
-      }, 500)
-    );
+        updateData(toSave as FormData);
+        localStorage.setItem("playerInfoFormData", JSON.stringify(toSave));
+      }, 500),
+    [selectedState, updateData, form]
+  );
 
-    return () => subscription.unsubscribe();
-  }, [form, selectedState, updateData]);
+  useEffect(() => {
+    const subscription = form.watch((values) => {
+      debouncedSave(values);
+    });
 
+    return () => {
+      (subscription as { unsubscribe: () => void })?.unsubscribe?.();
+      debouncedSave.cancel();
+    };
+  }, [form, debouncedSave]);
+
+  /** -------------------- Render -------------------- **/
   return (
-    <div className="space-y-6 bg-white px-5 border rounded-lg shadow-sm py-6">
+    <div className="space-y-6 md:bg-white md:px-5 md:border md:rounded-lg md:shadow-sm py-6">
       <div>
-        <h2 className="text-xl font-semibold tracking-tight text-blue-500">
+        <h2 className="text-xl font-semibold tracking-tight text-teal-500">
           Player Information
         </h2>
         <p className="text-sm text-muted-foreground">
@@ -203,8 +185,8 @@ export default function StepAPlayerInfo() {
       </div>
 
       <form
-        onBlur={form.handleSubmit(updateData)}
-        className="space-y-6"
+        onSubmit={form.handleSubmit(updateData)} // ✅ no more onBlur
+        className="space-y-6 grid grid-cols-1 md:grid-cols-2 gap-4"
         noValidate>
         {/* Full Name */}
         <div className="flex flex-col">
@@ -214,69 +196,66 @@ export default function StepAPlayerInfo() {
             {...form.register("full_name")}
             placeholder="Enter your full name"
           />
-          {form.formState.errors.full_name?.message && (
+          {form.formState.errors.full_name && (
             <p className="text-red-500 text-sm mt-1">
               {form.formState.errors.full_name.message}
             </p>
           )}
         </div>
 
-        {/* Date of Birth & Age */}
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1 flex flex-col">
-            <RequiredLabel>Date of Birth</RequiredLabel>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="w-full justify-start text-left font-normal">
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {date ? format(date, "PPP") : <span>Pick a date</span>}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={date}
-                  onSelect={(selectedDate) => {
-                    setDate(selectedDate);
-                    if (selectedDate) {
-                      const formattedDateOfBirth = selectedDate
-                        .toISOString()
-                        .split("T")[0];
-                      form.setValue("date_of_birth", formattedDateOfBirth);
+        {/* Date of Birth */}
+        <div className="flex flex-col">
+          <RequiredLabel>Date of Birth</RequiredLabel>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className="w-full justify-start text-left font-normal"
+                type="button">
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {date ? format(date, "PPP") : <span>Pick a date</span>}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={date}
+                onSelect={(selectedDate) => {
+                  setDate(selectedDate);
+                  if (selectedDate) {
+                    const formatted = selectedDate.toISOString().split("T")[0];
+                    form.setValue("date_of_birth", formatted, {
+                      shouldValidate: true, // ✅ local field validation only
+                    });
 
-                      const today = new Date();
-                      let age =
-                        today.getFullYear() - selectedDate.getFullYear();
-                      const monthDiff =
-                        today.getMonth() - selectedDate.getMonth();
-                      const dayDiff = today.getDate() - selectedDate.getDate();
+                    const today = new Date();
+                    let age = today.getFullYear() - selectedDate.getFullYear();
+                    const monthDiff =
+                      today.getMonth() - selectedDate.getMonth();
+                    const dayDiff = today.getDate() - selectedDate.getDate();
+                    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0))
+                      age--;
+                    form.setValue("age", age);
+                  }
+                }}
+              />
+            </PopoverContent>
+          </Popover>
+          {form.formState.errors.date_of_birth && (
+            <p className="text-red-500 text-sm mt-1">
+              {form.formState.errors.date_of_birth.message}
+            </p>
+          )}
+        </div>
 
-                      if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0))
-                        age--;
-                      form.setValue("age", age);
-                      form.trigger(["date_of_birth", "age"]);
-                    }
-                  }}
-                />
-              </PopoverContent>
-            </Popover>
-            {form.formState.errors.date_of_birth?.message && (
-              <p className="text-red-500 text-sm mt-1">
-                {form.formState.errors.date_of_birth.message}
-              </p>
-            )}
-          </div>
-
-          <div className="flex-1 flex flex-col">
-            <RequiredLabel>Age</RequiredLabel>
-            <Input
-              value={form.watch("age") || ""}
-              disabled
-              placeholder="Age will be calculated"
-            />
-          </div>
+        {/* Age */}
+        <div className="flex flex-col">
+          <RequiredLabel>Age</RequiredLabel>
+          <Input
+            value={form.watch("age") || ""}
+            disabled
+            placeholder="Age will be calculated"
+          />
         </div>
 
         {/* Gender */}
@@ -284,9 +263,11 @@ export default function StepAPlayerInfo() {
           <RequiredLabel>Gender</RequiredLabel>
           <Select
             onValueChange={(val) =>
-              form.setValue("gender", val as "Male" | "Female")
+              form.setValue("gender", val as "Male" | "Female", {
+                shouldValidate: true,
+              })
             }
-            value={form.watch("gender") || undefined}>
+            value={form.watch("gender") || ""}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Select Gender" />
             </SelectTrigger>
@@ -295,7 +276,7 @@ export default function StepAPlayerInfo() {
               <SelectItem value="Female">Female</SelectItem>
             </SelectContent>
           </Select>
-          {form.formState.errors.gender?.message && (
+          {form.formState.errors.gender && (
             <p className="text-red-500 text-sm mt-1">
               {form.formState.errors.gender.message}
             </p>
@@ -310,7 +291,7 @@ export default function StepAPlayerInfo() {
             {...form.register("nationality")}
             placeholder="Enter your nationality"
           />
-          {form.formState.errors.nationality?.message && (
+          {form.formState.errors.nationality && (
             <p className="text-red-500 text-sm mt-1">
               {form.formState.errors.nationality.message}
             </p>
@@ -325,7 +306,7 @@ export default function StepAPlayerInfo() {
             {...form.register("residential_address")}
             placeholder="Enter your address"
           />
-          {form.formState.errors.residential_address?.message && (
+          {form.formState.errors.residential_address && (
             <p className="text-red-500 text-sm mt-1">
               {form.formState.errors.residential_address.message}
             </p>
@@ -340,7 +321,7 @@ export default function StepAPlayerInfo() {
             {...form.register("languages_spoken")}
             placeholder="e.g. English, Yoruba, Hausa"
           />
-          {form.formState.errors.languages_spoken?.message && (
+          {form.formState.errors.languages_spoken && (
             <p className="text-red-500 text-sm mt-1">
               {form.formState.errors.languages_spoken.message}
             </p>
@@ -351,8 +332,12 @@ export default function StepAPlayerInfo() {
         <div className="flex flex-col">
           <RequiredLabel>Preferred Position</RequiredLabel>
           <Select
-            onValueChange={(val) => form.setValue("preferred_position", val)}
-            value={form.watch("preferred_position") || undefined}>
+            onValueChange={(val) =>
+              form.setValue("preferred_position", val, {
+                shouldValidate: true,
+              })
+            }
+            value={form.watch("preferred_position") || ""}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Select position" />
             </SelectTrigger>
@@ -363,7 +348,7 @@ export default function StepAPlayerInfo() {
               <SelectItem value="Forward">Forward</SelectItem>
             </SelectContent>
           </Select>
-          {form.formState.errors.preferred_position?.message && (
+          {form.formState.errors.preferred_position && (
             <p className="text-red-500 text-sm mt-1">
               {form.formState.errors.preferred_position.message}
             </p>
@@ -374,16 +359,14 @@ export default function StepAPlayerInfo() {
         <div className="flex flex-col">
           <RequiredLabel>State of Origin</RequiredLabel>
           <Select
-            onValueChange={(stateId: string) => {
+            onValueChange={(stateId) => {
               const stateNumber = Number(stateId);
               setSelectedState(stateNumber);
-              form.setValue("state_of_origin", stateNumber);
-
+              form.setValue("state_of_origin", stateNumber, {
+                shouldValidate: true,
+              });
               setSelectedLga(0);
               form.setValue("lga", 0);
-              form.clearErrors("lga");
-
-              console.log("State selected:", stateNumber);
             }}
             value={
               selectedState && selectedState > 0 ? selectedState.toString() : ""
@@ -399,7 +382,7 @@ export default function StepAPlayerInfo() {
               ))}
             </SelectContent>
           </Select>
-          {form.formState.errors.state_of_origin?.message && (
+          {form.formState.errors.state_of_origin && (
             <p className="text-red-500 text-sm mt-1">
               {form.formState.errors.state_of_origin.message}
             </p>
@@ -412,12 +395,10 @@ export default function StepAPlayerInfo() {
           <Select
             disabled={!selectedState || selectedState === 0}
             value={selectedLga && selectedLga > 0 ? selectedLga.toString() : ""}
-            onValueChange={(lgaId: string) => {
+            onValueChange={(lgaId) => {
               const lgaNumber = Number(lgaId);
               setSelectedLga(lgaNumber);
-              form.setValue("lga", lgaNumber);
-              form.trigger("lga");
-              console.log("LGA selected:", lgaNumber);
+              form.setValue("lga", lgaNumber, { shouldValidate: true });
             }}>
             <SelectTrigger className="w-full">
               <SelectValue
@@ -434,7 +415,7 @@ export default function StepAPlayerInfo() {
               ))}
             </SelectContent>
           </Select>
-          {form.formState.errors.lga?.message && (
+          {form.formState.errors.lga && (
             <p className="text-red-500 text-sm mt-1">
               {form.formState.errors.lga.message}
             </p>

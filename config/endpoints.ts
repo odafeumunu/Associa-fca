@@ -10,4 +10,7 @@ export const endpoints = {
   Register: {
     register_player: `${baseUrl}/registrations/`,
   },
+  Gallery: {
+    fetch_images: `${baseUrl}/gallery/images/`,
+  },
 };
